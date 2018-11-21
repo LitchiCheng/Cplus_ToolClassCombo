@@ -6,27 +6,27 @@
 using std::vector;
 using std::wstring;
 
-class ReadTxtToVector
+class ReadTextToVector
 {
 public:
-	ReadTxtToVector() {}
-	~ReadTxtToVector();
+	ReadTextToVector() {}
+	~ReadTextToVector();
 	int readToVector(vector<wstring> &data, wstring szFile, int line_size);
 	int readToVector(wstring szFile, int line_size);
 	int showOneByOneOfVector(int end_line_number);
-	int returnTxtLineNumber(vector<wstring> &data);
-	int returnTxtLineNumber();
+	int returnTextLineNumber(vector<wstring> &data);
+	int returnTextLineNumber();
 private:
 	vector<wstring> m_result;
 	wchar_t *strbuf;
 };
 
-ReadTxtToVector::~ReadTxtToVector()
+ReadTextToVector::~ReadTextToVector()
 {
 	delete[]strbuf;
 }
 
-int ReadTxtToVector:: readToVector(vector<wstring> &data, wstring szFile,int line_size)
+int ReadTextToVector:: readToVector(vector<wstring> &data, wstring szFile,int line_size)
 {
 	data.clear();
 	std::wifstream file_(szFile.c_str(), std::ios::in);
@@ -49,7 +49,7 @@ int ReadTxtToVector:: readToVector(vector<wstring> &data, wstring szFile,int lin
 	return 0;
 }
 
-int ReadTxtToVector::readToVector(wstring szFile, int line_size)
+int ReadTextToVector::readToVector(wstring szFile, int line_size)
 {
 	m_result.clear();
 	std::wifstream file_(szFile.c_str(), std::ios::in);
@@ -72,7 +72,7 @@ int ReadTxtToVector::readToVector(wstring szFile, int line_size)
 	return 0;
 }
 
-int ReadTxtToVector::showOneByOneOfVector(int end_line_number)
+int ReadTextToVector::showOneByOneOfVector(int end_line_number)
 {
 	if (m_result.size() > 0 && m_result.size() >= end_line_number)
 	{
@@ -89,12 +89,12 @@ int ReadTxtToVector::showOneByOneOfVector(int end_line_number)
 	return 0;
 }
 
-int ReadTxtToVector::returnTxtLineNumber(vector<wstring> &data)
+int ReadTextToVector::returnTextLineNumber(vector<wstring> &data)
 {
 	return data.size();
 }
 
-int ReadTxtToVector::returnTxtLineNumber()
+int ReadTextToVector::returnTextLineNumber()
 {
 	return m_result.size();
 }
