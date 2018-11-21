@@ -50,6 +50,7 @@ public:
 	RegexHandleClass(const std::string regular_express):m_match_express(regular_express){}
 	~RegexHandleClass(){}
 	int isPartIn(const char* szStr, const std::string regular_express);
+	int isPartIn(const char* szStr);
 private:
 	std::string m_match_express;
 };
@@ -57,6 +58,20 @@ private:
 int RegexHandleClass::isPartIn(const char* szStr,const std::string regular_express)
 {
 	boost::regex reg(regular_express);
+	boost::cmatch mat;
+	if (boost::regex_search(szStr, mat, reg))
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+int RegexHandleClass::isPartIn(const char* szStr)
+{
+	boost::regex reg(m_match_express);
 	boost::cmatch mat;
 	if (boost::regex_search(szStr, mat, reg))
 	{
