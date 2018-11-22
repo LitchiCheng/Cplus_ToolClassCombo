@@ -13,14 +13,18 @@ public:
 		TCP = 0,
 		UDP = 1
 	};
-	SocketHandleClass(protocol_type type, const std::string remote_address, const int remote_port);
+	SocketHandleClass(protocol_type type, const std::string remote_address, const int remote_port, bool show_send_or_not);
 	~SocketHandleClass();
-	void sendHex(const std::string hex_string);
-	void sendString(const char* real_string);
-	void readString(int read_buff_size);
+	void send(const char* real_string, int len);
+	void read(int read_buff_size);
+	void showRecieve();
 	bool isConnectSuccessful()
 	{
 		return m_connect_successful;
+	}
+	char * returnRecieveCharPtr()
+	{
+		return m_read_buff;
 	}
 private:
 	boost::asio::io_service io_service;
@@ -31,20 +35,16 @@ private:
 	int m_remote_port;
 	void setUdpRemote();
 	void setTcpRemote();
-	//char *m_read_buff;
 	char m_read_buff[1024];
-	boost::asio::ip::udp::endpoint m_remote()
-	{
-		boost::asio::ip::udp::endpoint remote(boost::asio::ip::address::from_string(m_remote_address), m_remote_port);
-		return remote;
-	}
 	boost::asio::ip::udp::socket* ptr_udp_socket;
 	boost::asio::ip::udp::endpoint m_udp_remote;
 	boost::asio::ip::tcp::socket* ptr_tcp_socket;
 	boost::asio::ip::tcp::endpoint m_tcp_remote;
+	int m_recieve_len;
+	bool m_show_send_or_not;
 };
 
-SocketHandleClass::SocketHandleClass(protocol_type type, const std::string remote_address, const int remote_port) :m_connect_successful(false), m_type(type), m_remote_address(remote_address), m_remote_port(remote_port), ptr_udp_socket(nullptr), ptr_tcp_socket(nullptr)
+SocketHandleClass::SocketHandleClass(protocol_type type, const std::string remote_address, const int remote_port, bool show_send_or_not) :m_connect_successful(false), m_type(type), m_remote_address(remote_address), m_remote_port(remote_port), ptr_udp_socket(nullptr), ptr_tcp_socket(nullptr), m_recieve_len(0), m_show_send_or_not(show_send_or_not)
 {
 	if (type == UDP)
 	{	
@@ -63,7 +63,6 @@ SocketHandleClass::~SocketHandleClass()
 		io_service.stop();
 	}
 }
-
 
 void SocketHandleClass::setUdpRemote()
 {
@@ -97,34 +96,11 @@ void SocketHandleClass::setTcpRemote()
 	std::cout << "Connect:" << (m_connect_successful ? "successful" : "failed") << std::endl;
 }
 
-void SocketHandleClass::sendHex(const std::string hex_string)
+void SocketHandleClass::send(const char * real_string, int len)
 {
-	boost::format format_object("%x");
-	format_object % hex_string.c_str();
 	if (m_type == TCP)
 	{
-		std::cout << "Send: " << format_object.str() << std::endl;
-		ptr_tcp_socket->write_some(boost::asio::buffer(format_object.str(), format_object.size()), ec);
-		if (ec)
-		{
-			std::cout << boost::system::system_error(ec).what() << std::endl;
-		}
-	}
-	else if(m_type == UDP)
-	{
-		std::cout << "Send: " << format_object.str() << std::endl;
-		ptr_udp_socket->send_to(boost::asio::buffer(format_object.str(), format_object.size()),m_udp_remote);
-	}
-}
-
-void SocketHandleClass::sendString(const char* real_string)
-{
-	int len = sizeof(real_string);
-	if (m_type == TCP)
-	{
-		std::cout << "Send: " << real_string << ":" << len << std::endl;
 		size_t tcp_write_len = ptr_tcp_socket->write_some(boost::asio::buffer(real_string, len), ec);
-		//std::cout << tcp_write_len << std::endl;
 		if (ec)
 		{
 			std::cout << boost::system::system_error(ec).what() << std::endl;
@@ -132,28 +108,35 @@ void SocketHandleClass::sendString(const char* real_string)
 	}
 	else if (m_type == UDP)
 	{
-		std::cout << "Send: " << real_string << std::endl;
 		size_t udp_write_len = ptr_udp_socket->send_to(boost::asio::buffer(real_string, len), m_udp_remote);	
+	}
+	if (m_show_send_or_not)
+	{
+		std::cout << "Send: " << real_string << " and it's lenght is " << len << std::endl;
 	}
 }
 
-void SocketHandleClass::readString(int read_buff_size = 0)			
+void SocketHandleClass::read(int read_buff_size = 0)			
 {
 	memset(m_read_buff,0,1024);
 	if (m_type == TCP)
 	{
-		size_t len = ptr_tcp_socket->read_some(boost::asio::buffer(m_read_buff), ec);
+		m_recieve_len = ptr_tcp_socket->read_some(boost::asio::buffer(m_read_buff), ec);
 		if (ec)
 		{
 			std::cout << boost::system::system_error(ec).what() << std::endl;
 		}
-		std::cout.write(m_read_buff, len);
-		std::cout << std::endl;
+		
 	}
 	else if(m_type == UDP)
 	{
-		size_t len = ptr_udp_socket->receive(boost::asio::buffer(m_read_buff, 1024));
-		std::cout.write(m_read_buff, len);
-		std::cout << std::endl;
+		m_recieve_len = ptr_udp_socket->receive(boost::asio::buffer(m_read_buff, 1024));
 	}
+}
+
+void SocketHandleClass::showRecieve()
+{
+	std::cout << "Recieve: ";
+	std::cout.write(m_read_buff, m_recieve_len);
+	std::cout << std::endl;
 }
