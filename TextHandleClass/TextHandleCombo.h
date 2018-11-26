@@ -98,3 +98,26 @@ int ReadTextToVector::returnTextLineNumber()
 {
 	return m_result.size();
 }
+class TextHandleTool
+{
+public:
+	TextHandleTool() {}
+	~TextHandleTool() {}
+	bool isPartIn(const char* string_raw, const char* string_match, int size);
+private:
+
+};
+
+bool TextHandleTool::isPartIn(const char* string_raw, const char* string_match, int size)
+{
+	std::string string_convert;
+	string_convert.assign(string_raw, size);
+	if (string_convert.find(string_match) != std::string::npos)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

@@ -26,6 +26,10 @@ public:
 	{
 		return m_read_buff;
 	}
+	int returnRecieveSize()
+	{
+		return m_recieve_len;
+	}
 private:
 	boost::asio::io_service io_service;
 	boost::system::error_code ec;
@@ -130,7 +134,7 @@ void SocketHandleClass::read(int read_buff_size = 0)
 	}
 	else if(m_type == UDP)
 	{
-		m_recieve_len = ptr_udp_socket->receive(boost::asio::buffer(m_read_buff, 1024));
+		m_recieve_len = ptr_udp_socket->receive(boost::asio::buffer(m_read_buff));
 	}
 }
 
