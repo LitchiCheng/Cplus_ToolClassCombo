@@ -121,3 +121,32 @@ bool TextHandleTool::isPartIn(const char* string_raw, const char* string_match, 
 		return false;
 	}
 }
+
+class TextPrintTool
+{
+public:
+	void stayPrint(const std::string out_string, int which_line);
+	void stayPrint(const std::string out_string, int which_line, int which_list);
+	~TextPrintTool() { CloseHandle(hStdout); }
+private:
+	HANDLE	hStdout;  
+	COORD	cursorPos;
+};
+
+void TextPrintTool::stayPrint(const std::string out_string,int which_line)
+{
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	cursorPos.X = 0;
+	cursorPos.Y = which_line;
+	SetConsoleCursorPosition(hStdout, cursorPos);
+	std::cout << out_string << std::endl;
+}
+
+void TextPrintTool::stayPrint(const std::string out_string, int which_line, int which_list)
+{
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	cursorPos.X = which_list;
+	cursorPos.Y = which_line;
+	SetConsoleCursorPosition(hStdout, cursorPos);
+	std::cout << out_string << std::endl;
+}
